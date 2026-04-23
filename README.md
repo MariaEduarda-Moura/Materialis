@@ -33,6 +33,6 @@ Este projeto visa fomentar a colaboração entre estudantes, reduzindo desperdí
 * docker compose up 
 
 ### Arquivos Criados:
-* 3 arquivos de Dockerfile para cada contêiner
+* Arquivos de Dockerfile
 * Arquivo compose.yml para composição dos contêineres
 
