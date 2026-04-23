@@ -20,3 +20,19 @@
 
 ## Motivação e Objetivos
 Este projeto visa fomentar a colaboração entre estudantes, reduzindo desperdício de recursos acadêmicos e promovendo a economia compartilhada no ambiente universitário. Além disso, consolida a aplicação prática de conceitos de engenharia de software, como arquitetura em camadas, segurança, tratamento de erros e testes automatizados.
+
+## Alteração para Utilizar Docker
+
+### Contêineres
+* **Banco de Dados:** MySQL 8.0
+* **Backend:** Spring Boot
+* **Serviço de email:** Mailpit (porta web para visualizar 8025)
+  
+### Comandos com docker
+* docker compose up --build
+* docker compose up 
+
+### Arquivos Criados:
+* 3 arquivos de Dockerfile para cada contêiner
+* Arquivo compose.yml para composição dos contêineres
+
