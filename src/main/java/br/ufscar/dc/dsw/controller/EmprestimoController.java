@@ -33,6 +33,9 @@ public class EmprestimoController {
     @Autowired
     private IMaterialService materialService;
 
+    @Autowired
+    private br.ufscar.dc.dsw.service.spec.IEmailService emailService;
+
     private Estudante getLoggedInEstudante() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -82,7 +85,18 @@ public class EmprestimoController {
         emprestimo.setMaterial(material);
     
         emprestimoService.salvar(emprestimo);
-        
+        try {
+            String donoEmail = material.getEstudante().getEmail();
+            String assunto = "Nova solicitação de empréstimo: " + material.getTitulo();
+            String texto = "Olá " + material.getEstudante().getNome() + ",\n\n" +
+                        estudante.getNome() + " solicitou o empréstimo do seu material. " +
+                        "Acesse o Materialis para aprovar ou recusar.";
+            
+            emailService.sendEmail(donoEmail, assunto, texto);
+            System.out.println("DEBUG: E-mail enviado para " + donoEmail);
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar e-mail: " + e.getMessage());
+        }
         attr.addFlashAttribute("sucesso", "Solicitação de empréstimo enviada com sucesso!");
         return "redirect:/emprestimos/meus-emprestimos";
     }

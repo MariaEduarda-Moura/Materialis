@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db_materialis
+    environment:
+      MYSQL_DATABASE: materialis
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mail_server:
+    image: axllent/mailpit
+    container_name: mail_materialis
+    ports:
+      - "8025:8025" # Interface Web para ver os e-mails
+      - "1025:1025" 
+
+  app:
+    build: .
+    container_name: app_materialis
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/materialis
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_MAIL_HOST=mail_server
+      - SPRING_MAIL_PORT=1025
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=false
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=false
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update

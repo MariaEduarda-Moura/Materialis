@@ -1,16 +1,17 @@
 package br.ufscar.dc.dsw;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import br.ufscar.dc.dsw.dao.IEstudanteDAO;
 import br.ufscar.dc.dsw.domain.Emprestimo;
 import br.ufscar.dc.dsw.domain.Estudante;
@@ -22,32 +23,35 @@ import br.ufscar.dc.dsw.service.spec.IMaterialService;
 
 @SpringBootApplication
 public class MaterialisApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(MaterialisApplication.class, args);
     }
 
     @Bean
-    public CommandLineRunner demo(IEstudanteDAO estudanteDAO, IMaterialService materialService, IEmprestimoService emprestimoService, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner demo(IEstudanteDAO estudanteDAO, IMaterialService materialService, 
+                                  IEmprestimoService emprestimoService, PasswordEncoder passwordEncoder) {
         return (args) -> {
             
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
             // 0. CRIAÇÃO DO ADMIN
             if (estudanteDAO.findByEmail("admin@materialis.com") == null) {
-            Estudante admin = new Estudante();
-            admin.setEmail("admin@materialis.com");
-            admin.setSenha(passwordEncoder.encode("admin")); 
-            admin.setNome("Administrador");
-            admin.setCpf("00000000000"); 
-            admin.setTelefone("00000000000");
-            admin.setSexo(Estudante.Sexo.Outro);
-            admin.setNascimento(LocalDate.of(1990, 1, 1)); 
-            admin.setRa("000000");
-            admin.setRole("ROLE_ADMIN");
-            estudanteDAO.save(admin);
-            System.out.println("Usuário 'admin' criado com sucesso!");
-        }
+                Estudante admin = new Estudante();
+                admin.setEmail("admin@materialis.com");
+                admin.setSenha(passwordEncoder.encode("admin")); 
+                admin.setNome("Administrador");
+                admin.setCpf("00000000000"); 
+                admin.setTelefone("00000000000");
+                admin.setSexo(Estudante.Sexo.Outro);
+                admin.setNascimento(LocalDate.of(1990, 1, 1)); 
+                admin.setRa("000000");
+                admin.setRole("ROLE_ADMIN");
+                estudanteDAO.save(admin);
+                System.out.println("Usuário 'admin' criado com sucesso!");
+            }
 
             // 1. CRIAÇÃO DOS ESTUDANTES
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             if (estudanteDAO.findByEmail("lorena@gmail.com") == null) {
                 Estudante e1 = new Estudante();
                 e1.setCpf("12314192823");
@@ -61,6 +65,7 @@ public class MaterialisApplication {
                 e1.setRole("ROLE_USER");
                 estudanteDAO.save(e1);
             }
+
             if (estudanteDAO.findByEmail("luis@gmail.com") == null) {
                 Estudante e2 = new Estudante();
                 e2.setCpf("18228319201");
@@ -79,92 +84,33 @@ public class MaterialisApplication {
             Estudante luis = estudanteDAO.findByEmail("luis@gmail.com");
 
             // 2. CRIAÇÃO DOS MATERIAIS
-            try {
-                // Materiais da Lorena
-                if (lorena != null) {
-                    // Kit de Papelaria
-                    if (materialService.buscarPorDono(lorena).stream().noneMatch(m -> m.getTitulo().equals("Kit de Papelaria Completo"))) {
-                        Material m = new Material();
-                        m.setTitulo("Kit de Papelaria Completo");
-                        m.setDescricao("Estojo completo para aulas.");
-                        m.setCategoria(Categoria.PAPELARIA);
-                        m.setEstadoConservacao(EstadoConservacao.NOVO);
-                        m.setLocalRetirada("Biblioteca Central");
-                        m.setEstudante(lorena);
-                        File file = new ClassPathResource("static/images/kit_papelaria.jpeg").getFile();
-                        m.setNomeImagem(file.getName());
-                        m.setTipoImagem(Files.probeContentType(file.toPath()));
-                        m.setImagem(Files.readAllBytes(file.toPath()));
-                        materialService.salvar(m);
-                    }
-                    // Livro de Java
-                    if (materialService.buscarPorDono(lorena).stream().noneMatch(m -> m.getTitulo().equals("Livro: Estruturas de Dados em Java"))) {
-                        Material m = new Material();
-                        m.setTitulo("Livro: Estruturas de Dados em Java");
-                        m.setDescricao("Livro texto usado, 2ª edição. Cobre listas, pilhas, filas, árvores e grafos.");
-                        m.setCategoria(Categoria.LIVROS);
-                        m.setEstadoConservacao(EstadoConservacao.REGULAR);
-                        m.setLocalRetirada("Sala dos Projetos de IC, Prédio de Computação");
-                        m.setEstudante(lorena);
-                        File file = new ClassPathResource("static/images/livro_java.jpg").getFile();
-                        m.setNomeImagem(file.getName());
-                        m.setTipoImagem(Files.probeContentType(file.toPath()));
-                        m.setImagem(Files.readAllBytes(file.toPath()));
-                        materialService.salvar(m);
-                    }
-                    // Calculadora
-                     if (materialService.buscarPorDono(lorena).stream().noneMatch(m -> m.getTitulo().equals("Calculadora Científica HP 50g"))) {
-                        Material m = new Material();
-                        m.setTitulo("Calculadora Científica HP 50g");
-                        m.setDescricao("Calculadora científica avançada, com funções de álgebra computacional.");
-                        m.setCategoria(Categoria.ELETRONICOS);
-                        m.setEstadoConservacao(EstadoConservacao.EXCELENTE);
-                        m.setLocalRetirada("Laboratório de Matemática, Prédio 5");
-                        m.setEstudante(lorena);
-                        File file = new ClassPathResource("static/images/calculadora.jpg").getFile();
-                        m.setNomeImagem(file.getName());
-                        m.setTipoImagem(Files.probeContentType(file.toPath()));
-                        m.setImagem(Files.readAllBytes(file.toPath()));
-                        materialService.salvar(m);
-                    }
-                }
+            // Materiais da Lorena
+            if (lorena != null) {
+                salvarMaterialComImagem(materialService, lorena, "Kit de Papelaria Completo", 
+                    "Estojo completo para aulas.", Categoria.PAPELARIA, EstadoConservacao.NOVO, 
+                    "Biblioteca Central", "static/images/kit_papelaria.jpeg", "image/jpeg");
 
-                // Materiais do Luis
-                if (luis != null) {
-                    // Kit Arduino
-                    if (materialService.buscarPorDono(luis).stream().noneMatch(m -> m.getTitulo().equals("Kit Arduino Uno"))) {
-                        Material m = new Material();
-                        m.setTitulo("Kit Arduino Uno");
-                        m.setDescricao("Ideal para projetos de eletrônica.");
-                        m.setCategoria(Categoria.ELETRONICOS);
-                        m.setEstadoConservacao(EstadoConservacao.BOM);
-                        m.setLocalRetirada("Laboratório de Eletrônica");
-                        m.setEstudante(luis);
-                        File file = new ClassPathResource("static/images/kit_arduino.jpg").getFile();
-                        m.setNomeImagem(file.getName());
-                        m.setTipoImagem(Files.probeContentType(file.toPath()));
-                        m.setImagem(Files.readAllBytes(file.toPath()));
-                        materialService.salvar(m);
-                    }
-                    // Livro de Banco de Dados
-                    if (materialService.buscarPorDono(luis).stream().noneMatch(m -> m.getTitulo().equals("Livro: Banco de Dados Relacionais"))) {
-                        Material m = new Material();
-                        m.setTitulo("Livro: Banco de Dados Relacionais");
-                        m.setDescricao("Livro em bom estado, aborda modelo relacional e SQL avançado.");
-                        m.setCategoria(Categoria.LIVROS);
-                        m.setEstadoConservacao(EstadoConservacao.BOM);
-                        m.setLocalRetirada("Sala de Aula de Banco de Dados, Bloco de TI");
-                        m.setEstudante(luis);
-                        File file = new ClassPathResource("static/images/livro_bd.jpg").getFile();
-                        m.setNomeImagem(file.getName());
-                        m.setTipoImagem(Files.probeContentType(file.toPath()));
-                        m.setImagem(Files.readAllBytes(file.toPath()));
-                        materialService.salvar(m);
-                    }
-                }
+                salvarMaterialComImagem(materialService, lorena, "Livro: Estruturas de Dados em Java", 
+                    "Livro texto usado, 2ª edição. Cobre listas, pilhas, filas, árvores e grafos.", 
+                    Categoria.LIVROS, EstadoConservacao.REGULAR, "Sala dos Projetos de IC, Prédio de Computação", 
+                    "static/images/livro_java.jpg", "image/jpeg");
 
-            } catch (IOException e) {
-                System.err.println("Erro ao carregar imagens de exemplo: " + e.getMessage());
+                salvarMaterialComImagem(materialService, lorena, "Calculadora Científica HP 50g", 
+                    "Calculadora científica avançada, com funções de álgebra computacional.", 
+                    Categoria.ELETRONICOS, EstadoConservacao.EXCELENTE, "Laboratório de Matemática, Prédio 5", 
+                    "static/images/calculadora.jpg", "image/jpeg");
+            }
+
+            // Materiais do Luis
+            if (luis != null) {
+                salvarMaterialComImagem(materialService, luis, "Kit Arduino Uno", 
+                    "Ideal para projetos de eletrônica.", Categoria.ELETRONICOS, EstadoConservacao.BOM, 
+                    "Laboratório de Eletrônica", "static/images/kit_arduino.jpg", "image/jpeg");
+
+                salvarMaterialComImagem(materialService, luis, "Livro: Banco de Dados Relacionais", 
+                    "Livro em bom estado, aborda modelo relacional e SQL avançado.", 
+                    Categoria.LIVROS, EstadoConservacao.BOM, "Sala de Aula de Banco de Dados, Bloco de TI", 
+                    "static/images/livro_bd.jpg", "image/jpeg");
             }
 
             // 3. CRIAÇÃO DE EMPRÉSTIMO DE TESTE
@@ -173,9 +119,7 @@ public class MaterialisApplication {
                 .findFirst().orElse(null);
 
             if (lorena != null && materialDeLuis != null) {
-                boolean existeSolicitacao = emprestimoService
-                        .buscarPorEstudante(lorena)
-                        .stream()
+                boolean existeSolicitacao = emprestimoService.buscarPorEstudante(lorena).stream()
                         .anyMatch(e -> e.getMaterial().getId().equals(materialDeLuis.getId()));
 
                 if (!existeSolicitacao) {
@@ -188,5 +132,38 @@ public class MaterialisApplication {
                 }
             }
         };
+    }
+
+    /**
+     * Método auxiliar para salvar materiais lendo a imagem do Classpath de forma segura para Docker/JAR
+     */
+    private void salvarMaterialComImagem(IMaterialService service, Estudante dono, String titulo, 
+                                        String desc, Categoria cat, EstadoConservacao estado, 
+                                        String local, String path, String contentType) {
+        
+        if (service.buscarPorDono(dono).stream().noneMatch(m -> m.getTitulo().equals(titulo))) {
+            try {
+                Material m = new Material();
+                m.setTitulo(titulo);
+                m.setDescricao(desc);
+                m.setCategoria(cat);
+                m.setEstadoConservacao(estado);
+                m.setLocalRetirada(local);
+                m.setEstudante(dono);
+
+                // A MÁGICA PARA DOCKER ESTÁ AQUI:
+                ClassPathResource res = new ClassPathResource(path);
+                try (InputStream is = res.getInputStream()) {
+                    byte[] imageBytes = is.readAllBytes();
+                    m.setImagem(imageBytes);
+                    m.setNomeImagem(path.substring(path.lastIndexOf("/") + 1));
+                    m.setTipoImagem(contentType);
+                }
+
+                service.salvar(m);
+            } catch (IOException e) {
+                System.err.println("Erro ao carregar imagem " + path + ": " + e.getMessage());
+            }
+        }
     }
 }
