@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8.0
+    build: ./db
     container_name: db_materialis
     environment:
       MYSQL_DATABASE: materialis
@@ -14,7 +14,7 @@ services:
       retries: 5
 
   mail_server:
-    image: axllent/mailpit
+    build: ./mail
     container_name: mail_materialis
     ports:
       - "8025:8025" # Interface Web para ver os e-mails
