@@ -5,8 +5,8 @@ services:
     environment:
       MYSQL_DATABASE: materialis
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
+    # ports:
+    #  - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -18,7 +18,7 @@ services:
     container_name: mail_materialis
     ports:
       - "8025:8025" # Interface Web para ver os e-mails
-      - "1025:1025" 
+     # - "1025:1025" 
 
   app:
     build: .
@@ -37,3 +37,7 @@ services:
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=false
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=false
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - TZ=America/Sao_Paulo
+      - LC_ALL=pt_BR.UTF-8
+      - LANG=pt_BR.UTF-8
+      - LANGUAGE=pt_BR.UTF-8
