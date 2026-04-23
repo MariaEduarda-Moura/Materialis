@@ -1,11 +1,11 @@
 services:
   db:
-    build: ./db
+    image: mysql:8.0
     container_name: db_materialis
     environment:
       MYSQL_DATABASE: materialis
       MYSQL_ROOT_PASSWORD: root
-    # ports:
+    #ports:
     #  - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -14,7 +14,7 @@ services:
       retries: 5
 
   mail_server:
-    build: ./mail
+    image: axllent/mailpit
     container_name: mail_materialis
     ports:
       - "8025:8025" # Interface Web para ver os e-mails
