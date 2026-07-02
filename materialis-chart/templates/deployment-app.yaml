@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "materialis.appName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "materialis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "materialis.appName" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "materialis.appName" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: app
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: "{{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}"
+          imagePullPolicy: {{ .Values.mysql.image.pullPolicy }}
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "materialis.mysqlName" . }}-secret
+                  key: root-password
+          command:
+            - /bin/sh
+            - -c
+            - until mysqladmin ping -h {{ include "materialis.mysqlName" . }} -uroot -p$MYSQL_ROOT_PASSWORD --silent; do echo "Aguardando MySQL..."; sleep 5; done
+      containers:
+        - name: materialis
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.service.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://{{ include "materialis.mysqlName" . }}:{{ .Values.mysql.service.port }}/{{ .Values.mysql.database }}"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.mysql.username | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "materialis.mysqlName" . }}-secret
+                  key: root-password
+            - name: SPRING_MAIL_HOST
+              value: {{ include "materialis.mailpitName" . | quote }}
+            - name: SPRING_MAIL_PORT
+              value: {{ .Values.mailpit.service.smtpPort | quote }}
+            - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+              value: "false"
+            - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+              value: "false"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: {{ .Values.app.env.jpaDdlAuto | quote }}
+            - name: TZ
+              value: {{ .Values.app.env.timezone | quote }}
+            - name: LC_ALL
+              value: {{ .Values.app.env.locale | quote }}
+            - name: LANG
+              value: {{ .Values.app.env.locale | quote }}
+            - name: LANGUAGE
+              value: {{ .Values.app.env.locale | quote }}
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6

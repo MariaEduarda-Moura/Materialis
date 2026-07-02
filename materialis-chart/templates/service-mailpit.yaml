@@ -1,0 +1,22 @@
+{{- if .Values.mailpit.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "materialis.mailpitName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "materialis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mailpit
+spec:
+  type: ClusterIP
+  ports:
+    - name: smtp
+      port: {{ .Values.mailpit.service.smtpPort }}
+      targetPort: smtp
+    - name: http
+      port: {{ .Values.mailpit.service.webPort }}
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: {{ include "materialis.mailpitName" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

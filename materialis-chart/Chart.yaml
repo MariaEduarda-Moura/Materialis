@@ -1,0 +1,6 @@
+apiVersion: v2
+name: materialis
+description: Helm Chart para executar a aplicação Materialis no Kubernetes/Minikube.
+type: application
+version: 0.1.0
+appVersion: "0.0.1-SNAPSHOT"

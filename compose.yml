@@ -5,8 +5,9 @@ services:
     environment:
       MYSQL_DATABASE: materialis
       MYSQL_ROOT_PASSWORD: root
-    #ports:
-    #  - "3306:3306"
+        #Adicionar volumes para persistência dos dados
+    volumes:
+      - db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -18,10 +19,10 @@ services:
     container_name: mail_materialis
     ports:
       - "8025:8025" # Interface Web para ver os e-mails
-     # - "1025:1025" 
 
   app:
-    build: .
+    #build: .
+    image: mariaeduardamoura/app-materialis:latest 
     container_name: app_materialis
     ports:
       - "8080:8080"
@@ -41,3 +42,6 @@ services:
       - LC_ALL=pt_BR.UTF-8
       - LANG=pt_BR.UTF-8
       - LANGUAGE=pt_BR.UTF-8
+
+volumes:
+  db_data:

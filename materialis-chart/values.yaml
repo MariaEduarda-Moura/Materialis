@@ -1,0 +1,51 @@
+namespace: materialis
+
+image:
+  repository: mariaeduardamoura/materialis
+  tag: latest
+  pullPolicy: IfNotPresent
+
+app:
+  replicaCount: 1
+  service:
+    port: 8080
+  env:
+    timezone: America/Sao_Paulo
+    locale: pt_BR.UTF-8
+    jpaDdlAuto: update
+
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+  database: materialis
+  username: root
+  rootPassword: root
+  service:
+    port: 3306
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: standard
+
+mailpit:
+  enabled: true
+  image:
+    repository: axllent/mailpit
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    smtpPort: 1025
+    webPort: 8025
+  ingress:
+    enabled: true
+    host: mail.k8s.local
+
+ingress:
+  enabled: true
+  className: nginx
+  host: k8s.local
+  path: /
+  pathType: Prefix

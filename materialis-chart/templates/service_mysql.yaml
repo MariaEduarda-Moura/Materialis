@@ -1,0 +1,19 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "materialis.mysqlName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "materialis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mysql
+spec:
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: {{ .Values.mysql.service.port }}
+      targetPort: mysql
+  selector:
+    app.kubernetes.io/name: {{ include "materialis.mysqlName" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
