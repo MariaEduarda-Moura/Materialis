@@ -18,7 +18,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Ativa o "fail-fast" (para o script se ocorrer algum erro)
+# Ativa o "fail-fast" 
 set -e
 
 # Função para validar dependências

@@ -20,7 +20,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Ativa o "fail-fast" (para o script imediatamente se qualquer comando falhar)
+# Ativa o "fail-fast" 
 set -e
 
 # Função para validar se os comandos necessários estão instalados

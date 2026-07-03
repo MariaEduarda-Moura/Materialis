@@ -22,7 +22,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Para a execução imediatamente se houver erro (equivalente ao $ErrorActionPreference = "Stop")
+# Para a execução imediatamente se houver erro
 set -e
 
 # Função para validar dependências

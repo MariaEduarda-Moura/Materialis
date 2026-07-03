@@ -151,7 +151,6 @@ public class MaterialisApplication {
                 m.setLocalRetirada(local);
                 m.setEstudante(dono);
 
-                // A MÁGICA PARA DOCKER ESTÁ AQUI:
                 ClassPathResource res = new ClassPathResource(path);
                 try (InputStream is = res.getInputStream()) {
                     byte[] imageBytes = is.readAllBytes();
