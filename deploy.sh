@@ -35,7 +35,7 @@ assert_command() {
 assert_command "helm"
 assert_command "kubectl"
 
-CHART_PATH="./charts/materialis"
+CHART_PATH="./materialis-chart"
 REPOSITORY="${DOCKER_HUB_USER}/${IMAGE_NAME}"
 
 echo "Instalando/atualizando release Helm $RELEASE_NAME..."
